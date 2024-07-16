@@ -71,7 +71,7 @@ class ChessComFetcher:
                 try:
                     response = await client.get(url)
                     games.extend(response.json()["games"])
-                except HTTPError | KeyError as e:
+                except HTTPError or KeyError as e:
                     raise FetcherError(e)
         try:
             return [game for game in games if since <= game["end_time"] <= until]
