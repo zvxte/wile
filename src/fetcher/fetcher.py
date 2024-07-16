@@ -35,6 +35,9 @@ class ChessComFetcher:
         until: Optional[int] = None,
         limit: Optional[int] = None,  # Unused in this implementation
     ) -> list[dict[str, Any]]:
+        # Chess.com public API
+        # https://www.chess.com/news/view/published-data-api
+
         current_timestamp = int(time())
         if until is None:
             until = current_timestamp
@@ -68,12 +71,12 @@ class ChessComFetcher:
                 try:
                     response = await client.get(url)
                     games.extend(response.json()["games"])
-                except HTTPError as e:
+                except HTTPError | KeyError as e:
                     raise FetcherError(e)
         try:
             return [game for game in games if since <= game["end_time"] <= until]
-        except KeyError:
-            raise FetcherError("Key `end_time` not present")
+        except KeyError as e:
+            raise FetcherError(e)
 
 
 async def main():
