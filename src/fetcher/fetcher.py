@@ -74,16 +74,17 @@ class ChessComFetcher:
                 except HTTPError or KeyError as e:
                     raise FetcherError(e)
         try:
-            return [game for game in games if since <= game["end_time"] <= until]
+            return [game for game in games if since <= game["end_time"] <= until and game["rules"] == "chess"]
         except KeyError as e:
             raise FetcherError(e)
 
 
 async def main():
+    # testing
     fetcher = ChessComFetcher()
     games = await fetcher.fetch("hikaru", 1720742400)  # July 12, 2024
     for game in games:
-        print(game, "\n")
+        print(game, "\n\n\n")
 
 
 if __name__ == "__main__":
