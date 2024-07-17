@@ -1,4 +1,3 @@
-from asyncio import run
 from datetime import date
 from time import time
 from typing import Any, Iterable, Optional, Protocol
@@ -74,7 +73,11 @@ class ChessComFetcher:
                 except HTTPError or KeyError as e:
                     raise FetcherError(e)
         try:
-            return [game for game in games if since <= game["end_time"] <= until and game["rules"] == "chess"]
+            return [
+                game
+                for game in games
+                if since <= game["end_time"] <= until and game["rules"] == "chess"
+            ]
         except KeyError as e:
             raise FetcherError(e)
 
@@ -82,10 +85,13 @@ class ChessComFetcher:
 async def main():
     # testing
     fetcher = ChessComFetcher()
-    games = await fetcher.fetch("hikaru", 1720742400)  # July 12, 2024
+    games = await fetcher.fetch("hikaru", 1720742400)  # since July 12, 2024
     for game in games:
-        print(game, "\n\n\n")
+        print(dumps(game, indent=4), end="\n\n")
 
 
 if __name__ == "__main__":
+    from asyncio import run
+    from json import dumps
+
     run(main())
