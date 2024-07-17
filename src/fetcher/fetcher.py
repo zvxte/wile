@@ -15,10 +15,17 @@ class Fetcher(Protocol):
         username: str,
         since: int,
         until: Optional[int] = None,
-        limit: Optional[int] = None,
     ) -> Iterable[Any]:
         """
         Fetches chess games
+
+        Args:
+            username (str): Username of a player.
+            since (int): Since when to fetch the games as unix timestamp.
+            until (int, optional): Until when to fetch the games as unix timestamp. Defaults to now.
+
+        Returns:
+            Iterable[Any]: All fetched games. Type depends on specific implementation.
 
         Raises:
             FetcherError
@@ -32,23 +39,25 @@ class ChessComFetcher:
         username: str,
         since: int,
         until: Optional[int] = None,
-        limit: Optional[int] = None,  # Unused in this implementation
     ) -> list[dict[str, Any]]:
-        # Chess.com public API
+        # Fetching from Chess.com public API
         # https://www.chess.com/news/view/published-data-api
 
         current_timestamp = int(time())
         if until is None:
             until = current_timestamp
-        if (
-            len(username) < 3
-            or since > current_timestamp
-            or until > current_timestamp
-            or since < 1177977600  # May 1, 2007
-            or until < 1177977600
-            or since > until
-        ):
-            raise FetcherError("Invalid arguments")
+        try:
+            if (
+                len(username) < 3
+                or since > current_timestamp
+                or until > current_timestamp
+                or since < 1177977600  # May 1, 2007
+                or until < 1177977600
+                or since > until
+            ):
+                raise FetcherError("Invalid arguments")
+        except TypeError as e:
+            raise FetcherError(e)
 
         since_date = date.fromtimestamp(since)
         until_date = date.fromtimestamp(until)
