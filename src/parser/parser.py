@@ -12,6 +12,12 @@ class Parser(Protocol):
         """
         Parses chess game
 
+        Args:
+            game (Any): Game to parse. Type depends on specific implementation.
+
+        Returns:
+            Game: Parsed game.
+
         Raises:
             ParserError
         """
@@ -40,7 +46,6 @@ class ChessComParser:
 
 async def main():
     # testing
-
     fetcher = ChessComFetcher()
     games = await fetcher.fetch("hikaru", 1721088000)  # since July 16, 2024
 
