@@ -1,3 +1,4 @@
+from typing import Optional
 from .player import Player
 
 
@@ -10,7 +11,8 @@ class Game:
         white: Player,
         black: Player,
         initial_fen: str,
-        moves: list[str],
+        san_moves: Optional[list[str]] = None,
+        uci_moves: Optional[list[str]] = None,
     ):
         if (
             not game_id
@@ -19,7 +21,6 @@ class Game:
             or not white
             or not black
             or not initial_fen
-            or not moves
         ):
             raise ValueError("Invalid arguments")
         self.game_id = game_id
@@ -28,7 +29,8 @@ class Game:
         self.white = white
         self.black = black
         self.initial_fen = initial_fen
-        self.moves = moves
+        self.san_moves = san_moves
+        self.uci_moves = uci_moves
 
     def __repr__(self) -> str:
-        return f"Game({self.game_id}, {self.platform}, {self.url}, {self.white}, {self.black}, {self.initial_fen}, {self.moves})"
+        return f"Game(\n{self.game_id}\n{self.platform}\n{self.url}\n{self.white}\n{self.black}\n{self.initial_fen}\n{self.san_moves}\n{self.uci_moves}\n)"

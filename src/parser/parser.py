@@ -38,7 +38,7 @@ class ChessComParser:
                     username=game["black"]["username"], rating=game["black"]["rating"]
                 ),
                 initial_fen=game["initial_setup"],
-                moves=parse_pgn_moves(game["pgn"]),
+                san_moves=parse_pgn_moves(game["pgn"]),
             )
         except KeyError or ValueError as e:
             raise ParserError(e)
