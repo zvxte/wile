@@ -28,8 +28,8 @@ class Fetcher(Protocol):
             Iterable[Any]: All fetched games. Type depends on specific implementation.
 
         Raises:
-            AssertionError: If arguments with invalid types are provided
-            FetcherError: If arguments are logically invalid; If failed to fetch games
+            AssertionError: If arguments with invalid types are provided.
+            FetcherError: If arguments are logically invalid; If failed to fetch games.
         """
         raise NotImplementedError
 

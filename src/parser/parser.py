@@ -19,13 +19,16 @@ class Parser(Protocol):
             Game: Parsed game.
 
         Raises:
-            ParserError
+            AssertionError: If arguments with invalid types are provided.
+            ParserError: If failed to parse game.
         """
         raise NotImplementedError
 
 
 class ChessComParser:
     def parse(self, game: dict[str, Any]) -> Game:
+        assert isinstance(game, dict), ["Invalid game type", game]
+
         try:
             return Game(
                 game_id=game["uuid"],
