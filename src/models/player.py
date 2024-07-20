@@ -1,7 +1,18 @@
 class Player:
+    """
+    Represents chess player
+    
+    Raises:
+        AssertionError: If arguments with invalid types are provided.
+        ValueError: If str arguments are empty.
+    """
     def __init__(self, username: str, rating: int):
-        if not username or not rating:
+        assert isinstance(username, str), ["Invalid username type", username]
+        assert isinstance(rating, int), ["Invalid rating type", rating]
+
+        if not username:
             raise ValueError("Invalid arguments")
+
         self.username = username
         self.rating = rating
 
