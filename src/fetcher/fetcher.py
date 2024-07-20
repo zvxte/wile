@@ -28,7 +28,8 @@ class Fetcher(Protocol):
             Iterable[Any]: All fetched games. Type depends on specific implementation.
 
         Raises:
-            FetcherError
+            AssertionError: If arguments with invalid types are provided
+            FetcherError: If arguments are logically invalid; If failed to fetch games
         """
         raise NotImplementedError
 
@@ -46,18 +47,20 @@ class ChessComFetcher:
         current_timestamp = int(time())
         if until is None:
             until = current_timestamp
-        try:
-            if (
-                len(username) < 3
-                or since > current_timestamp
-                or until > current_timestamp
-                or since < 1177977600  # May 1, 2007
-                or until < 1177977600
-                or since > until
-            ):
-                raise FetcherError("Invalid arguments")
-        except TypeError as e:
-            raise FetcherError(e)
+
+        assert isinstance(username, str), ["Invalid username type", username]
+        assert isinstance(since, int), ["Invalid since type", since]
+        assert isinstance(until, int), ["Invalid until type", until]
+
+        if (
+            len(username) < 3
+            or since > current_timestamp
+            or until > current_timestamp
+            or since < 1177977600  # May 1, 2007
+            or until < 1177977600
+            or since > until
+        ):
+            raise FetcherError("Invalid arguments")
 
         since_date = date.fromtimestamp(since)
         until_date = date.fromtimestamp(until)
