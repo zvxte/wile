@@ -4,7 +4,7 @@ class Player:
     
     Raises:
         AssertionError: If arguments with invalid types are provided.
-        ValueError: If str arguments are empty.
+        ValueError: If argument values are falsy.
     """
     def __init__(self, username: str, rating: int):
         assert isinstance(username, str), ["Invalid username type", username]
