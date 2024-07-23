@@ -1,2 +1,2 @@
-from .parser import Parser, ChessComParser
+from .game import GameParser, ChessComGameParser 
 from .error import ParserError
