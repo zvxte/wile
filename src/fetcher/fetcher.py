@@ -82,7 +82,7 @@ class ChessComFetcher:
                 try:
                     response = await client.get(url)
                     games.extend(response.json()["games"])
-                except HTTPError or KeyError as e:
+                except (HTTPError, KeyError) as e:
                     raise FetcherError(e)
         try:
             return [

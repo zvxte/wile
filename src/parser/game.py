@@ -44,7 +44,7 @@ class ChessComGameParser:
                 initial_fen=game["initial_setup"],
                 moves=moves
             )
-        except KeyError or ValueError as e:
+        except (KeyError, ValueError) as e:
             raise ParserError(e)
 
 
