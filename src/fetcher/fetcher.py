@@ -25,7 +25,7 @@ class Fetcher(Protocol):
             until (int, optional): Until when to fetch the games as unix timestamp. Defaults to now.
 
         Returns:
-            Iterable[Any]: All fetched games. Type depends on specific implementation.
+            Iterable[Any]: All fetched games.
 
         Raises:
             AssertionError: If arguments with invalid types are provided.
