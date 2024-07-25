@@ -4,12 +4,12 @@ from typing import Protocol, Iterable, Any
 class Engine(Protocol):
     """Engine Interface"""
 
-    async def analyse(self, uci_moves: Iterable[Any]) -> Iterable[Any]:
+    async def analyze(self, uci_moves: Iterable[Any]) -> Iterable[Any]:
         """
-        Analyses chess game
+        Analyzes chess game
 
         Args:
-            uci_moves (Iterable[Any]): Moves to analyse in UCI notation.
+            uci_moves (Iterable[Any]): Moves to analyze in UCI notation.
 
         Returns:
             Iterable[Any]: Analysis result.
