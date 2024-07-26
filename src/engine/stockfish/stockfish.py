@@ -1,9 +1,10 @@
-from typing import Optional, Union
+from subprocess import SubprocessError
+from typing import Optional, Union, Any
 from os import cpu_count
 from queue import SimpleQueue
-from asyncio import TaskGroup, sleep
-from time import perf_counter
+from asyncio import TaskGroup
 
+from ..error import EngineError
 from .worker import StockfishWorker
 
 
@@ -42,7 +43,7 @@ class LocalStockfishEngine:
             multipv = 3
         if max_workers is None:
             threads = cpu_count()
-            max_workers = max(1, threads - 2) if threads else 1
+            max_workers = max(1, threads - 2) if threads is not None else 1
 
         self.path = path
         self.depth = depth
@@ -54,39 +55,39 @@ class LocalStockfishEngine:
         assert isinstance(uci_moves, list), ["Invalid uci_moves type", uci_moves]
 
         input_queue = SimpleQueue()
-        analyses = []
+        analyses: list[Any] = [None] * len(uci_moves)
 
-        for i in range(len(uci_moves)):
-            input_queue.put(uci_moves[: i + 1])
+        for index in range(len(uci_moves)):
+            input_queue.put((index, uci_moves[: index + 1]))
 
         async def run_worker() -> None:
             worker = StockfishWorker(self.path, self.depth, self.multipv)
 
             await worker.open()
             while not input_queue.empty():
-                moves = input_queue.get()
+                index, moves = input_queue.get()
                 await worker.position(initial_fen, moves)
-                before = perf_counter()
                 analysis = await worker.go()
-                analyses.append(analysis)
+                analyses[index] = analysis
             await worker.close()
 
             return None
 
-        async with TaskGroup() as tg:
-            for _ in range(self.max_workers):
-                tg.create_task(run_worker())
+        try:
+            async with TaskGroup() as task_group:
+                for _ in range(self.max_workers):
+                    task_group.create_task(run_worker())
+        except SubprocessError as e:
+            raise EngineError(e)
 
         return analyses
 
 
-# class RemoteStockfishEngine:
-# Todo
-# ...
+# class RemoteStockfishEngine: ...  # TODO
 
 
 async def main():
-    engine = LocalStockfishEngine("stockfish", 18, 1)
+    engine = LocalStockfishEngine("stockfish", 18, 3, 9)
     print(engine.__dict__)
     before = perf_counter()
     analyses = await engine.analyze(
@@ -100,5 +101,6 @@ async def main():
 
 if __name__ == "__main__":
     from asyncio import run
+    from time import perf_counter
 
     run(main())
