@@ -7,7 +7,7 @@ from asyncio.subprocess import PIPE, Process
 class StockfishWorker:
     """Stockfish Engine Worker"""
 
-    def __init__(self, path: str, depth: int = 18, multipv: int = 1):
+    def __init__(self, path: str, depth: int, multipv: int):
         assert isinstance(path, str), ["Invalid path type", path]
         assert isinstance(depth, int), ["Invalid depth type", depth]
         assert isinstance(multipv, int), ["Invalid multipv type", multipv]
@@ -27,7 +27,7 @@ class StockfishWorker:
 
         await self._write("uci\n")
         while True:
-            line = await self._read()
+            line = await self._read_line()
             if line == "uciok":
                 break
             if line is None:
@@ -35,6 +35,8 @@ class StockfishWorker:
 
         # Set engine options
         await self._write(f"setoption name MultiPV value {self.multipv}\n")
+        # await self._write(f"setoption name Threads value 1\n")
+        # await self._write(f"setoption name Hash value 64\n")
 
     async def close(self):
         """Closes Stockfish subprocess"""
@@ -49,9 +51,9 @@ class StockfishWorker:
         """Sets board position"""
         assert isinstance(initial_fen, str), ["Invalid initial_fen type", initial_fen]
         assert isinstance(uci_moves, list), ["Invalid uci_moves type", uci_moves]
-
+        await self._clear_stdout_stream()
         await self._write("isready\n")
-        status = await self._read()
+        status = await self._read_line()
         if status == "readyok":
             await self._write(
                 f"position fen {initial_fen} moves {" ".join(uci_moves)}\n"
@@ -61,12 +63,12 @@ class StockfishWorker:
 
     async def go(self) -> list[str]:
         """Analyzes position"""
-        # Todo: Fix wrong result when analysing on higher depths
+        # TODO: Fix wrong result when analysing on higher depths
         await self._write(f"go depth {self.depth}\n")
         best_lines: list[str] = []
         pv_counter = 0
         while pv_counter < self.multipv:
-            line = await self._read()
+            line = await self._read_line()
             if line is None:
                 continue
             if line.startswith(f"info depth {self.depth} seldepth"):
@@ -74,10 +76,10 @@ class StockfishWorker:
                 pv_counter += 1
         return best_lines
 
-    async def _read(self) -> Optional[str]:
+    async def _read_line(self) -> Optional[str]:
         if self._process and self._process.stdout:
             try:
-                line = await wait_for(self._process.stdout.readline(), 0.5)
+                line = await wait_for(self._process.stdout.readline(), 1)
                 return line.decode().strip()
             except TimeoutError:
                 return None
@@ -86,6 +88,15 @@ class StockfishWorker:
         if self._process and self._process.stdin:
             self._process.stdin.write(command.encode())
             await self._process.stdin.drain()
+
+    async def _clear_stdout_stream(self) -> None:
+        if self._process and self._process.stdout:
+            try:
+                await wait_for(self._process.stdout.read(), 0.1)
+            except TimeoutError:
+                pass
+            finally:
+                return None
 
 
 async def main():
