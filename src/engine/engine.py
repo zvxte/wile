@@ -14,5 +14,9 @@ class Engine(Protocol):
 
         Returns:
             Iterable[Any]: Analysis result.
+
+        Raises:
+            AssertionError: If arguments with invalid types are provided.
+            EngineError: If failed to run engine process; If failed to communicate with the engine process.
         """
         raise NotImplementedError
