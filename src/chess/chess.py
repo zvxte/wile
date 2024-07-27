@@ -21,7 +21,7 @@ class Chess(Protocol):
 
     def san_to_uci(self, san_move: str) -> str:
         """
-        Converts from SAN to UCI notation used by many chess engines
+        Converts from SAN to UCI notation
 
         Args:
             san_move (str): Move in SAN notation.
@@ -36,7 +36,7 @@ class Chess(Protocol):
 
     def from_fen(self, fen: str) -> None:
         """
-        Sets up board state from given FEN
+        Sets up current position from given FEN
 
         Args:
             fen (str): Position in FEN.
@@ -51,7 +51,7 @@ class Chess(Protocol):
 
     def to_fen(self) -> str:
         """
-        Returns FEN of current board state
+        Returns FEN of current position
 
         Args:
             None
