@@ -5,3 +5,7 @@
 # Python
 venv
 __pycache__
+
+# Config
+.zed
+
