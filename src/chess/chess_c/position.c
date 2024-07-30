@@ -64,8 +64,8 @@ Position_t position_create_from_fen(const char *fen) {
   char *character = fen_inner;
 
   // ====PIECE PLACEMENT==== //
-  for (int rank = RANK_8; rank >= RANK_1; rank -= 1) {
-    for (int file = FILE_A; file <= FILE_H;) {
+  for (Rank_t rank = RANK_8; rank >= RANK_1; rank--) {
+    for (File_t file = FILE_A; file <= FILE_H;) {
       Square_t square = square_create_from_file_rank(file, rank);
       Bitboard_t bitboard = bitboard_create_from_square(square);
       if (*character == '/') {

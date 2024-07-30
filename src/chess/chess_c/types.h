@@ -34,7 +34,7 @@ typedef enum Piece {
   PIECE_NONE,
 } Piece_t;
 
-typedef enum File {
+typedef enum File : int {
   FILE_A,
   FILE_B,
   FILE_C,
@@ -45,7 +45,7 @@ typedef enum File {
   FILE_H,
 } File_t;
 
-typedef enum Rank {
+typedef enum Rank : int {
   RANK_1,
   RANK_2,
   RANK_3,
