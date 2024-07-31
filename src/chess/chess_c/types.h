@@ -25,35 +25,21 @@ typedef enum Color {
 } Color_t;
 
 typedef enum Piece {
-  PIECE_PAWN,
-  PIECE_KNIGHT,
-  PIECE_BISHOP,
-  PIECE_ROOK,
-  PIECE_QUEEN,
-  PIECE_KING,
+  PIECE_WHITE_PAWN, PIECE_WHITE_KNIGHT, PIECE_WHITE_BISHOP,
+  PIECE_WHITE_ROOK, PIECE_WHITE_QUEEN, PIECE_WHITE_KING,
+
+  PIECE_BLACK_PAWN, PIECE_BLACK_KNIGHT, PIECE_BLACK_BISHOP,
+  PIECE_BLACK_ROOK, PIECE_BLACK_QUEEN, PIECE_BLACK_KING,
+
   PIECE_NONE,
 } Piece_t;
 
 typedef enum File : int {
-  FILE_A,
-  FILE_B,
-  FILE_C,
-  FILE_D,
-  FILE_E,
-  FILE_F,
-  FILE_G,
-  FILE_H,
+  FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H,
 } File_t;
 
 typedef enum Rank : int {
-  RANK_1,
-  RANK_2,
-  RANK_3,
-  RANK_4,
-  RANK_5,
-  RANK_6,
-  RANK_7,
-  RANK_8,
+  RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8,
 } Rank_t;
 
 typedef enum Direction {
@@ -122,15 +108,22 @@ void bitboard_print(Bitboard_t bitboard);
 
 Square_t square_create_from_file_rank(File_t file, Rank_t rank);
 
+char piece_to_char(Piece_t piece);
+
 File_t file_create_from_char(char character);
+File_t file_create_from_square(Square_t square);
+char file_to_char(File_t file);
 
 Rank_t rank_create_from_char(char character);
+Rank_t rank_create_from_square(Square_t square);
+char rank_to_char(Rank_t rank);
 
 Position_t position_create();
 Position_t position_create_empty();
 Position_t position_create_from_fen(const char *fen);
-int position_move(Position_t *position, const Move_t *move);
 char* position_get_fen(const Position_t *position);
+int position_move(Position_t *position, const Move_t *move);
+Piece_t position_get_piece_at_square(const Position_t *position, Square_t square);
 
 #endif
 // ====TYPES_H==== //
