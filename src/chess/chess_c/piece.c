@@ -17,7 +17,7 @@ char piece_to_char(Piece_t piece) {
     case PIECE_BLACK_QUEEN: return 'q';
     case PIECE_BLACK_KING: return 'k';
     
-    default: return '\0';
+    default: return ' ';
   }
   // clang-format on
 };
