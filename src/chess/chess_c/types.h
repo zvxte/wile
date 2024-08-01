@@ -58,23 +58,25 @@ typedef enum CastlingRights {
 } CastlingRights_t;
 
 typedef enum MoveType {
+  MOVE_TYPE_NORMAL,
   MOVE_TYPE_PROMOTION,
-  MOVE_TYPE_EN_PASSANT,
   MOVE_TYPE_CASTLING,
+  // MOVE_TYPE_EN_PASSANT,
 } MoveType_t;
 
-typedef enum MoveSymbol {
-  MOVE_SYMBOL_NONE,
-  MOVE_SYMBOL_CHECK,
-  MOVE_SYMBOL_MATE,
-} MoveSymbol_t;
+// typedef enum MoveSymbol {
+//   MOVE_SYMBOL_NONE,
+//   MOVE_SYMBOL_CHECK,
+//   MOVE_SYMBOL_MATE,
+// } MoveSymbol_t;
 
 typedef struct Move {
   Square_t source_square;
   Square_t target_square;
+  Piece_t piece;
   Piece_t promotion_piece;
   MoveType_t move_type;
-  MoveSymbol_t move_symbol;
+  // MoveSymbol_t move_symbol;
 } Move_t;
 
 typedef struct Position {
@@ -102,28 +104,75 @@ typedef struct Position {
 } Position_t;
 
 
-
-Bitboard_t bitboard_create_from_square(Square_t square);
+// ---Bitboard--- //
+static inline Bitboard_t bitboard_from_square(Square_t square) {
+  return (Bitboard_t)1 << square;
+};
+static inline void bitboard_unset(Bitboard_t *bitboard, Square_t square) {
+  *bitboard &= ~bitboard_from_square(square);
+};
+static inline void bitboard_set(Bitboard_t *bitboard, Square_t square) {
+  *bitboard |= bitboard_from_square(square);
+};
 void bitboard_print(Bitboard_t bitboard);
 
-Square_t square_create_from_file_rank(File_t file, Rank_t rank);
 
+// ---Square--- //
+static inline Square_t square_from_file_rank(File_t file, Rank_t rank) {
+  return (Square_t)((rank << 3) + file);
+};
+
+
+// ---Piece--- //
 char piece_to_char(Piece_t piece);
 
-File_t file_create_from_char(char character);
-File_t file_create_from_square(Square_t square);
-char file_to_char(File_t file);
 
-Rank_t rank_create_from_char(char character);
-Rank_t rank_create_from_square(Square_t square);
-char rank_to_char(Rank_t rank);
+// ---File--- //
+static inline File_t file_from_char(char character) {
+  return (File_t)(character - 'a');
+};
+static inline File_t file_from_square(Square_t square) {
+  return (File_t)(square & 7);
+};
+static inline char file_to_char(File_t file) {
+  return (char)(file + 'a');
+};
 
+
+// ---Rank--- //
+static inline Rank_t rank_from_char(char character) {
+  return (Rank_t)(character - '1');
+};
+static inline Rank_t rank_from_square(Square_t square) {
+  return (Rank_t)(square >> 3);
+};
+static inline char rank_to_char(Rank_t rank) {
+  return (char)(rank + '1');
+};
+
+
+// ---Castling Rights--- //
+static inline void castling_rights_set(CastlingRights_t *castling_rights, CastlingRights_t value) {
+  *castling_rights = (CastlingRights_t)(*castling_rights | value);
+};
+static inline void castling_rights_unset(CastlingRights_t *castling_rights, CastlingRights_t value) {
+  *castling_rights = (CastlingRights_t)(*castling_rights & ~value);
+};
+
+
+// ---Move--- //
+Move_t move_from_san(Position_t *position, char *san_move);
+
+
+// ---Position--- //
 Position_t position_create();
 Position_t position_create_empty();
-Position_t position_create_from_fen(const char *fen);
+Position_t position_from_fen(const char *fen);
+void position_move(Position_t *position, const Move_t *move);
+void position_unset(Position_t *position, Square_t square);
+Piece_t position_get_piece(const Position_t *position, Square_t square);
 char* position_get_fen(const Position_t *position);
-int position_move(Position_t *position, const Move_t *move);
-Piece_t position_get_piece_at_square(const Position_t *position, Square_t square);
+
 
 #endif
 // ====TYPES_H==== //
