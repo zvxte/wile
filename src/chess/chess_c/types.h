@@ -161,7 +161,7 @@ static inline void castling_rights_unset(CastlingRights_t *castling_rights, Cast
 
 
 // ---Move--- //
-Move_t move_from_san(Position_t *position, char *san_move);
+Move_t move_from_san(const Position_t *position, const char *san_move);
 
 
 // ---Position--- //
