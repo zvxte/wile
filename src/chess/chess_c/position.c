@@ -56,6 +56,7 @@ Position_t position_create_empty() {
 };
 
 Position_t position_from_fen(const char *fen) {
+  // TODO: validate legality of received fen
   char fen_inner[128];
   strncpy(fen_inner, fen, 127);
   fen_inner[127] = '\0';
@@ -121,7 +122,7 @@ Position_t position_from_fen(const char *fen) {
       case 'K': castling_rights_set(&position.castling_rights, CASTLING_RIGHTS_WHITE_KINGSIDE); break;
       case 'Q': castling_rights_set(&position.castling_rights, CASTLING_RIGHTS_WHITE_QUEENSIDE); break;
       case 'k': castling_rights_set(&position.castling_rights, CASTLING_RIGHTS_BLACK_KINGSIDE); break;
-      case 'q': castling_rights_set(&position.castling_rights, CASTLING_RIGHTS_BLACK_KINGSIDE); break;
+      case 'q': castling_rights_set(&position.castling_rights, CASTLING_RIGHTS_BLACK_QUEENSIDE); break;
     }
     // clang-format on
 
