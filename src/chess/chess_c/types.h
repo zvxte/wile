@@ -61,14 +61,7 @@ typedef enum MoveType {
   MOVE_TYPE_NORMAL,
   MOVE_TYPE_PROMOTION,
   MOVE_TYPE_CASTLING,
-  // MOVE_TYPE_EN_PASSANT,
 } MoveType_t;
-
-// typedef enum MoveSymbol {
-//   MOVE_SYMBOL_NONE,
-//   MOVE_SYMBOL_CHECK,
-//   MOVE_SYMBOL_MATE,
-// } MoveSymbol_t;
 
 typedef struct Move {
   Square_t source_square;
@@ -76,7 +69,6 @@ typedef struct Move {
   Piece_t piece;
   Piece_t promotion_piece;
   MoveType_t move_type;
-  // MoveSymbol_t move_symbol;
 } Move_t;
 
 typedef struct Position {
@@ -108,6 +100,9 @@ typedef struct Position {
 static inline Bitboard_t bitboard_from_square(Square_t square) {
   return (Bitboard_t)1 << square;
 };
+Bitboard_t bitboard_from_piece(const Position_t *position, Square_t square, Piece_t piece);
+Bitboard_t bitboard_from_file(File_t file);
+Bitboard_t bitboard_from_rank(Rank_t rank);
 static inline void bitboard_unset(Bitboard_t *bitboard, Square_t square) {
   *bitboard &= ~bitboard_from_square(square);
 };
@@ -121,7 +116,19 @@ void bitboard_print(Bitboard_t bitboard);
 static inline Square_t square_from_file_rank(File_t file, Rank_t rank) {
   return (Square_t)((rank << 3) + file);
 };
+static inline Square_t square_from_trailing_zeros(Bitboard_t bitboard) {
+  int trailing_zeros = 0;
+  while ((bitboard & 1) == 0) {
+    trailing_zeros++;
+    bitboard >>= 1;
+  }
+  return (Square_t)trailing_zeros;
+};
 
+// ---Color--- //
+static inline Color_t color_opposite(Color_t color) {
+    return (color == COLOR_BLACK) ? COLOR_WHITE : COLOR_BLACK;
+}
 
 // ---Piece--- //
 char piece_to_char(Piece_t piece);
@@ -149,7 +156,6 @@ static inline Rank_t rank_from_square(Square_t square) {
 static inline char rank_to_char(Rank_t rank) {
   return (char)(rank + '1');
 };
-
 
 // ---Castling Rights--- //
 static inline void castling_rights_set(CastlingRights_t *castling_rights, CastlingRights_t value) {
