@@ -76,7 +76,19 @@ class Chess(Protocol):
 
 
 class ChessPy:
+    """
+    Chess Library in Python
+    
+    Args:
+        fen (str): Position in FEN.
+    
+    Raises:
+        AssertionError: If arguments with invalid types are provided.
+    """
+
     def __init__(self, fen: Optional[str] = STARTING_FEN):
+        assert isinstance(fen, str), ["Invalid fen type", fen]
+        
         self.chessboard = Board(fen)
 
     def move(self, uci_move: str) -> None:
