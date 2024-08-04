@@ -22,7 +22,7 @@ class Fetcher(Protocol):
         Args:
             username (str): Username of a player.
             since (int): Since when to fetch the games as unix timestamp.
-            until (int, optional): Until when to fetch the games as unix timestamp. Defaults to now.
+            until (Optional[int]): Until when to fetch the games as unix timestamp. Defaults to now.
 
         Returns:
             Iterable[Any]: All fetched games.
