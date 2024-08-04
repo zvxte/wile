@@ -1,6 +1,7 @@
 from typing import Optional, Union
 
 from .analysis import Analysis
+from .score import ScoreName
 
 
 class Move:
@@ -16,7 +17,7 @@ class Move:
         self,
         san_move: str,
         uci_move: Optional[str] = None,
-        score_name: Optional[str] = None,
+        score_name: Optional[ScoreName] = None,
         score_value: Optional[int] = None,
         analyses: Optional[list[Analysis]] = None,
     ):
@@ -25,7 +26,7 @@ class Move:
             "Invalid uci_move type",
             uci_move,
         ]
-        assert isinstance(score_name, Union[str, None]), [
+        assert isinstance(score_name, Union[ScoreName, None]), [
             "Invalid score_name type",
             score_name,
         ]
@@ -43,7 +44,9 @@ class Move:
 
         self.san_move = san_move
         self.uci_move = uci_move
+        self.score_name = score_name
+        self.score_value = score_value
         self.analyses = analyses
 
     def __repr__(self) -> str:
-        return f"Move({self.san_move}, {self.uci_move}, {self.analyses})"
+        return f"Move(\n{self.san_move}\n{self.uci_move}\n{self.score_name}\n{self.score_value}\n{self.analyses}\n)"
