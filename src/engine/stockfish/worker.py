@@ -4,7 +4,7 @@ from asyncio import create_subprocess_exec, wait_for
 from asyncio.subprocess import PIPE, Process
 
 
-class StockfishWorker:
+class StockfishEngineWorker:
     """Stockfish Engine Worker"""
 
     def __init__(self, path: str, depth: int, multipv: int):
@@ -71,9 +71,11 @@ class StockfishWorker:
             line = await self._read_line()
             if line is None:
                 continue
-            if line.startswith(f"info depth {self.depth} seldepth"):
+            elif line.startswith(f"info depth {self.depth} seldepth"):
                 best_lines.append(line)
                 pv_counter += 1
+            elif line.startswith("bestmove"):
+                break
         return best_lines
 
     async def _read_line(self) -> Optional[str]:
@@ -100,7 +102,7 @@ class StockfishWorker:
 
 
 async def main():
-    worker = StockfishWorker("stockfish", 20, 3)
+    worker = StockfishEngineWorker("stockfish", 20, 3)
     await worker.open()
     await worker.position(
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",

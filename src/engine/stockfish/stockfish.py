@@ -5,7 +5,7 @@ from queue import SimpleQueue
 from asyncio import TaskGroup
 
 from ..error import EngineError
-from .worker import StockfishWorker
+from .worker import StockfishEngineWorker
 
 
 class LocalStockfishEngine:
@@ -61,7 +61,7 @@ class LocalStockfishEngine:
             input_queue.put((index, uci_moves[: index + 1]))
 
         async def run_worker() -> None:
-            worker = StockfishWorker(self.path, self.depth, self.multipv)
+            worker = StockfishEngineWorker(self.path, self.depth, self.multipv)
 
             await worker.open()
             while not input_queue.empty():
@@ -87,15 +87,20 @@ class LocalStockfishEngine:
 
 
 async def main():
-    engine = LocalStockfishEngine("stockfish", 18, 3, 9)
+    engine = LocalStockfishEngine("stockfish", 16, 1, 10)
     print(engine.__dict__)
     before = perf_counter()
+    # fmt: off
     analyses = await engine.analyze(
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-        ["e2e4", "e7e5", "g1f3", "b8c6", "f1b5", "g8f6", "e1g1", "f6e4", "f1e1"],
+        [
+            "e2e4", "e7e6", "d2d4", "a7a6", "a2a3", "d7d5", "b1c3", "d5e4", "c3e4", "h7h6", "g1f3", "f8e7", "c1f4", "g8f6", "f1d3",
+            "b7b5", "e1g1", "c8b7", "f1e1", "b8d7", "d1d2", "c7c5", "c2c3", "c5c4", "d3c2", "d7b6", "a1d1", "b6d5", "f4g3", "f6h5",
+            "f3e5", "d5f6", "d2e2", "d8d5", "f2f3", "h5g3", "h2g3", "d5d8", "g1f2", "f6e4", "c2e4", "b7e4", "e2e4", "e8g8", "e1h1",
+            "e7f6", "e5g4", "d8e7", "g4h6", "g7h6", "h1h6", "f8d8", "d1h1", "a8c8", "h6h8", "f6h8", "e4h7", "g8f8", "h7h8",
+        ],
     )
-    for analysis in analyses:
-        print(analysis, end="\n\n")
+    # fmt: on
     print("\n\nTime: ", perf_counter() - before)
 
 
