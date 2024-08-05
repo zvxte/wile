@@ -1,7 +1,8 @@
 from typing import Optional, Union
 
 from .analysis import Analysis
-from .score import ScoreName
+from .score import Score
+from .color import Color
 
 
 class Move:
@@ -17,8 +18,8 @@ class Move:
         self,
         san_move: str,
         uci_move: Optional[str] = None,
-        score_name: Optional[ScoreName] = None,
-        score_value: Optional[int] = None,
+        side: Optional[Color] = None,
+        score: Optional[Score] = None,
         analyses: Optional[list[Analysis]] = None,
     ):
         assert isinstance(san_move, str), ["Invalid san_move type", san_move]
@@ -26,14 +27,8 @@ class Move:
             "Invalid uci_move type",
             uci_move,
         ]
-        assert isinstance(score_name, Union[ScoreName, None]), [
-            "Invalid score_name type",
-            score_name,
-        ]
-        assert isinstance(score_value, Union[int, None]), [
-            "Invalid score_value type",
-            score_value,
-        ]
+        assert isinstance(side, Union[Color, None]), ["Invalid side type", side]
+        assert isinstance(score, Union[Score, None]), ["Invalid score_name type", score]
         assert isinstance(analyses, Union[list, None]), [
             "Invalid analyses type",
             analyses,
@@ -44,9 +39,9 @@ class Move:
 
         self.san_move = san_move
         self.uci_move = uci_move
-        self.score_name = score_name
-        self.score_value = score_value
+        self.side = side
+        self.score = score
         self.analyses = analyses
 
     def __repr__(self) -> str:
-        return f"Move(\n{self.san_move}\n{self.uci_move}\n{self.score_name}\n{self.score_value}\n{self.analyses}\n)"
+        return f"Move(\n{self.san_move}\n{self.uci_move}\n{self.side}\n{self.score}\n{self.analyses}\n)"
