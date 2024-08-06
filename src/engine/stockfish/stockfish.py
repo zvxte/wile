@@ -14,7 +14,7 @@ class LocalStockfishEngine:
 
     Args:
         path (str): Path to Stockfish engine executable
-        depth (int): Stockfish analysies depth
+        depth (int)
         multipv (int): Number of best engine lines to return
         max_workers (int): Number of Stockfish processes running at the same time
 

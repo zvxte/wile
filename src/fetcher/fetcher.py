@@ -8,7 +8,13 @@ from .error import FetcherError
 
 
 class Fetcher(Protocol):
-    """Fetcher Interface"""
+    """
+    Fetcher Interface
+
+    Fetcher implementations are responsible for fetching games from
+    various chess platforms. Fetched games should be later on parsed
+    using appropriate game parser.
+    """
 
     async def fetch(
         self,
@@ -20,16 +26,16 @@ class Fetcher(Protocol):
         Fetches chess games
 
         Args:
-            username (str): Username of a player.
+            username (str)
             since (int): Since when to fetch the games as unix timestamp.
             until (Optional[int]): Until when to fetch the games as unix timestamp. Defaults to now.
 
         Returns:
-            Iterable[Any]: All fetched games.
+            Iterable[Any]: All found games. Iterable could be empty if no game was found.
 
         Raises:
             AssertionError: If arguments with invalid types are provided.
-            FetcherError: If arguments are logically invalid; If failed to fetch games.
+            FetcherError: If arguments are logically invalid. If failed to fetch games.
         """
         raise NotImplementedError
 
@@ -43,7 +49,8 @@ class ChessComFetcher:
     ) -> list[dict[str, Any]]:
         # Fetching from Chess.com public API
         # https://www.chess.com/news/view/published-data-api
-
+        # Endpoint:
+        # https://api.chess.com/pub/player/{username}/games/{YYYY}/{MM}
         current_timestamp = int(time())
         if until is None:
             until = current_timestamp
@@ -78,6 +85,7 @@ class ChessComFetcher:
 
         games: list[dict[str, Any]] = []
         async with AsyncClient() as client:
+            # Send requests synchronously to not encounter any rate limiting
             for url in urls:
                 try:
                     response = await client.get(url)

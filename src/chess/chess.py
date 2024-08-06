@@ -12,21 +12,27 @@ from .error import ChessError
 
 
 class Chess(Protocol):
-    """Chess Library Interface"""
+    """
+    Chess Library Interface
+
+    Chess library implementations are responsbile for converting
+    move notations to interact with chess engines and generating FENs
+    that are required by puzzles as a starting positions.
+    """
 
     def move(self, uci_move: str) -> None:
         """
         Makes a move
 
         Args:
-            uci_move (str): Move in UCI notation.
+            uci_move (str)
 
         Returns:
             None
 
         Raises:
             AssertionError: If arguments with invalid types are provided.
-            ChessError: If invalid move in uci notation is provided.
+            ChessError: If move is illegal or invalid.
         """
         raise NotImplementedError
 
@@ -35,14 +41,14 @@ class Chess(Protocol):
         Converts from SAN to UCI notation
 
         Args:
-            san_move (str): Move in SAN notation.
+            san_move (str)
 
         Returns:
             str: Move in UCI notation.
 
         Raises:
             AssertionError: If arguments with invalid types are provided.
-            ChessError: If invalid move in algebraic notation is provided.
+            ChessError: If move is invalid.
         """
         raise NotImplementedError
 
@@ -51,14 +57,14 @@ class Chess(Protocol):
         Sets up current position from given FEN
 
         Args:
-            fen (str): Position in FEN.
+            fen (str)
 
         Returns:
             None
 
         Raises:
             AssertionError: If arguments with invalid types are provided.
-            ChessError: If invalid FEN is provided.
+            ChessError: If FEN is invalid.
         """
         raise NotImplementedError
 
@@ -76,20 +82,8 @@ class Chess(Protocol):
 
 
 class ChessPy:
-    """
-    Chess Library in Python
-    
-    Args:
-        fen (str): Position in FEN.
-    
-    Raises:
-        AssertionError: If arguments with invalid types are provided.
-    """
-
-    def __init__(self, fen: Optional[str] = STARTING_FEN):
-        assert isinstance(fen, str), ["Invalid fen type", fen]
-        
-        self.chessboard = Board(fen)
+    def __init__(self):
+        self.chessboard = Board()
 
     def move(self, uci_move: str) -> None:
         assert isinstance(uci_move, str), ["Invalid uci_move type", uci_move]

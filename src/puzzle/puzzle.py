@@ -7,17 +7,25 @@ from ..models import Game, Puzzle, Color
 
 
 class PuzzleCreator(Protocol):
-    """Puzzle Creator Interface"""
+    """
+    Puzzle Creator Interface
+
+    Puzzle creator implementations are responsible for creating
+    chess puzzles based on some rules. Moves of a given game
+    should be already analyzed before invoking any methods or
+    creator will always return empty iterable, but single
+    not analyzed moves will mostly not interrupt.
+    """
 
     def create(self, game: Game) -> Iterable[Puzzle]:
         """
         Creates chess puzzles
 
         Args:
-            game (Game): Internal Game model
+            game (Game)
 
         Returns:
-            Iterable[Puzzle]: All found puzzles
+            Iterable[Puzzle]: All found puzzles. Could be empty.
         """
         raise NotImplementedError
 
@@ -37,10 +45,14 @@ class AnalysisBasedPuzzleCreator:
             if move.score is None or move.analyses is None:
                 continue
             best_line = move.analyses[0]
-            if move.score.score_name == ScoreName.CP and best_line.score.score_name == ScoreName.CP:
+            if (
+                move.score.score_name == ScoreName.CP
+                and best_line.score.score_name == ScoreName.CP
+            ):
                 if (
                     -400 < move.score.score_value < 400
-                    and abs(move.score.score_value) - abs(best_line.score.score_value) > 100
+                    and abs(move.score.score_value) - abs(best_line.score.score_value)
+                    > 100
                 ):
                     self.chess.from_fen(game.initial_fen)
                     uci_moves = [move.uci_move for move in game.moves[:i]]
@@ -75,7 +87,7 @@ async def main():
     game_parser = ChessComGameParser()
     fetched_games = await fetcher.fetch("hikaru", 1720908000)
     games = [game_parser.parse(game, "hikaru") for game in fetched_games][:4]
-    
+
     chessboard = ChessPy()
     for game in games:
         chessboard.from_fen(game.initial_fen)
@@ -83,30 +95,32 @@ async def main():
             uci_move = chessboard.san_to_uci(move.san_move)
             move.uci_move = uci_move
             chessboard.move(uci_move)
-    
+
     engine = LocalStockfishEngine("stockfish", depth=18, multipv=1, max_workers=10)
     analysis_parser = StockfishAnalysisParser()
-    
+
     for game in games:
         uci_moves = [move.uci_move for move in game.moves]
         engine_result = await engine.analyze(game.initial_fen, [""] + uci_moves)
         for i in range(len(game.moves)):
             move = game.moves[i]
-            analyses = [analysis_parser.parse(analysis, move.side) for analysis in engine_result[i]]
+            analyses = [
+                analysis_parser.parse(analysis, move.side)
+                for analysis in engine_result[i]
+            ]
             move.analyses = [] + analyses
             if i > 0:
                 game.moves[i - 1].score = analyses[0].score
-    
-    
+
     for game in games:
         print("GAME: ", game, "\n\n")
-    
-    
+
     creator = AnalysisBasedPuzzleCreator()
     puzzles = [creator.create(game) for game in games]
-    
+
     for puzzle in puzzles:
         print(puzzle, "\n\n")
+
 
 if __name__ == "__main__":
     from asyncio import run

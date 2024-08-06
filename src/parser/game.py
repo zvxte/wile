@@ -13,15 +13,15 @@ class GameParser(Protocol):
         Parses chess game
 
         Args:
-            game (Any): Game to parse.
+            game (Any)
             username (str): Username to determine player's side.
 
         Returns:
-            Game: Parsed game.
+            Game
 
         Raises:
             AssertionError: If arguments with invalid types are provided.
-            ParserError: If failed to parse game.
+            ParserError
         """
         raise NotImplementedError
 

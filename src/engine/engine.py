@@ -2,18 +2,27 @@ from typing import Protocol, Iterable, Any
 
 
 class Engine(Protocol):
-    """Engine Interface"""
+    """
+    Engine Interface
 
-    async def analyze(self, initial_fen: str, uci_moves: Iterable[Any]) -> Iterable[Any]:
+    Engine implementations are responsible for communicating with chess engines
+    to analyze chess positions. Analyzed positions can then be parsed by
+    appropriate analysis parser, appended to it's move object and searched
+    through by a puzzle creator to create puzzles.
+    """
+
+    async def analyze(
+        self, initial_fen: str, uci_moves: Iterable[str]
+    ) -> Iterable[Any]:
         """
         Analyzes chess game
 
         Args:
-            initial_fen (str): Initial position in FEN.
-            uci_moves (Iterable[Any]): Moves to analyze in UCI notation.
+            initial_fen (str)
+            uci_moves (Iterable[str])
 
         Returns:
-            Iterable[Any]: Analysis result.
+            Iterable[Any]: Result of analyzed positions.
 
         Raises:
             AssertionError: If arguments with invalid types are provided.

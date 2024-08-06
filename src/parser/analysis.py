@@ -12,15 +12,15 @@ class AnalysisParser(Protocol):
         Parses analysis result
 
         Args:
-            analysis (Any): Analysis to parse.
+            analysis (Any)
             side (Color): Player's side. Used to convert relative values into absolute.
 
         Returns:
-            Analysis: Parsed analysis.
+            Analysis
 
         Raises:
             AssertionError: If arguments with invalid types are provided.
-            ParserError: If failed to parse analysis.
+            ParserError
         """
         raise NotImplementedError
 
