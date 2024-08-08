@@ -101,7 +101,7 @@ async def main():
 
     for game in games:
         uci_moves = [move.uci_move for move in game.moves]
-        engine_result = await engine.analyze(game.initial_fen, [""] + uci_moves)
+        engine_result = await engine.analyze(game.initial_fen, uci_moves)
         for i in range(len(game.moves)):
             move = game.moves[i]
             analyses = [
