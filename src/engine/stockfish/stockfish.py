@@ -55,10 +55,11 @@ class LocalStockfishEngine:
         assert isinstance(uci_moves, list), ["Invalid uci_moves type", uci_moves]
 
         input_queue = SimpleQueue()
-        analyses: list[Any] = [None] * len(uci_moves)
+        analyses: list[Any] = [None] * (len(uci_moves) + 1)
 
-        for index in range(len(uci_moves)):
-            input_queue.put((index, uci_moves[: index + 1]))
+        input_queue.put((0, [""]))
+        for index in range(1, len(uci_moves) + 1):
+            input_queue.put((index, uci_moves[: index]))
 
         async def run_worker() -> None:
             worker = StockfishEngineWorker(self.path, self.depth, self.multipv)
