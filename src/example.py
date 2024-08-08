@@ -6,17 +6,17 @@ from .chess import ChessPy
 from .engine import EngineError
 from .engine.stockfish import LocalStockfishEngine
 from .puzzle import AnalysisBasedPuzzleCreator
-from .models import *
+from .models import Game, Move, Analysis, Puzzle
 
 
 async def example():
     USERNAME = "hikaru"
     SINCE = 1722902400
     UNTIL = 1722988800
+    LIMIT = 3
     DEPTH = 18
     MULTIPV = 3  # How many best lines to return in a position
     MAX_WORKERS = 8  # How many chess engine instances to run at the same time
-    LIMIT = 5
 
     fetcher = ChessComFetcher()
     fetched_games: list[dict[str, Any]] = await fetcher.fetch(USERNAME, SINCE)
@@ -39,12 +39,19 @@ async def example():
     engine = LocalStockfishEngine("stockfish", DEPTH, MULTIPV, MAX_WORKERS)
     analysis_parser = StockfishAnalysisParser()
     for game in games:
-        uci_moves: list[str] = [move.uci_move for move in game.moves]
+        uci_moves: list[str] = []
+        for move in game.moves:
+            if move.uci_move is None:
+                raise ValueError("uci_move should be set")
+            uci_moves.append(move.uci_move)
+
         results: list[list[str]] = await engine.analyze(game.initial_fen, uci_moves)
 
         # Append each position analysis result to it's move
         for i in range(len(game.moves)):
             move: Move = game.moves[i]
+            if move.side is None:
+                raise ValueError("side should be set")
             best_lines: list[str] = results[i]
 
             # Parse engine's result
@@ -62,6 +69,8 @@ async def example():
     puzzles: list[Puzzle] = []
     for game in games:
         puzzles += puzzle_creator.create(game)
+
+    print(f"Found {len(puzzles)} puzzles")
 
     for puzzle in puzzles:
         print("---PUZZLE---\n", puzzle, "------------\n")
