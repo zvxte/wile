@@ -54,6 +54,8 @@ class ChessComFetcher:
         current_timestamp = int(time())
         if until is None:
             until = current_timestamp
+        elif until > current_timestamp:
+            until = current_timestamp
 
         assert isinstance(username, str), ["Invalid username type", username]
         assert isinstance(since, int), ["Invalid since type", since]
@@ -62,7 +64,6 @@ class ChessComFetcher:
         if (
             len(username) < 3
             or since > current_timestamp
-            or until > current_timestamp
             or since < 1177977600  # May 1, 2007
             or until < 1177977600
             or since > until
