@@ -125,7 +125,7 @@ class ChessPy:
 
 
 # class ChessC:
-#     pass  # Not finished yet
+#     pass  # TODO
 
 
 if __name__ == "__main__":
