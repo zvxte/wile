@@ -3,7 +3,6 @@ from typing import Any
 from .fetcher import ChessComFetcher
 from .parser import ChessComGameParser, StockfishAnalysisParser
 from .chess import ChessPy
-from .engine import EngineError
 from .engine.stockfish import LocalStockfishEngine
 from .puzzle import AnalysisBasedPuzzleCreator
 from .models import Game, Move, Analysis, Puzzle
