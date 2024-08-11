@@ -1,6 +1,7 @@
 from datetime import date
 from time import time
 from typing import Any, Iterable, Optional, Protocol
+from json import loads
 
 from httpx import AsyncClient, HTTPError
 
@@ -51,6 +52,7 @@ class ChessComFetcher:
         # https://www.chess.com/news/view/published-data-api
         # Endpoint:
         # https://api.chess.com/pub/player/{username}/games/{YYYY}/{MM}
+        
         current_timestamp = int(time())
         if until is None:
             until = current_timestamp
@@ -103,12 +105,69 @@ class ChessComFetcher:
             raise FetcherError(e)
 
 
+class LichessFetcher:
+    async def fetch(
+        self,
+        username: str,
+        since: int,
+        until: Optional[int] = None,
+    ) -> list[dict[str, Any]]:
+        # Fetching from Lichess.org public API
+        # https://lichess.org/api#tag/Games/operation/apiGamesUser
+        # Endpoint:
+        # https://lichess.org/api/games/user/{username} + query parameters
+        
+        current_timestamp = int(time())
+        if until is None:
+            until = current_timestamp
+        elif until > current_timestamp:
+            until = current_timestamp
+        
+        assert isinstance(username, str), ["Invalid username type", username]
+        assert isinstance(since, int), ["Invalid since type", since]
+        assert isinstance(until, int), ["Invalid until type", until]
+        
+        if (
+            len(username) < 2
+            or since > current_timestamp
+            or since < 1356998400  # Jan 1, 2013
+            or until < 1356998400
+            or since > until
+        ):
+            raise FetcherError("Invalid arguments")
+
+        url = f"https://lichess.org/api/games/user/{username}"
+        headers = {
+            "Accept": "application/x-ndjson",
+        }
+        params = {
+            "since": since * 1000,
+            "until": until * 1000,
+        }
+
+        games = []
+        async with AsyncClient() as client:
+            try:
+                response = await client.get(url, headers=headers, params=params)
+                for game in response.iter_lines():
+                    games.append(loads(game))
+            except HTTPError as e:
+                raise FetcherError(e)
+
+        return games
+
+
 async def main():
     # testing
-    fetcher = ChessComFetcher()
-    games = await fetcher.fetch("hikaru", 1720742400)  # since July 12, 2024
+    # chesscom_fetcher = ChessComFetcher()
+    # games = await chesscom_fetcher.fetch("hikaru", 1720742400)  # since July 12, 2024
+    # for game in games:
+    #     print(dumps(game, indent=4), end="\n\n")
+
+    lichess_fetcher = LichessFetcher()
+    games = await lichess_fetcher.fetch("", 1723208004, 1723380804)
     for game in games:
-        print(dumps(game, indent=4), end="\n\n")
+        print(game, "\n\n")
 
 
 if __name__ == "__main__":

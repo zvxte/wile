@@ -1,2 +1,2 @@
-from .fetcher import Fetcher, ChessComFetcher
+from .fetcher import Fetcher, ChessComFetcher, LichessFetcher
 from .error import FetcherError
