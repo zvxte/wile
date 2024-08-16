@@ -16,10 +16,9 @@ See [example](./src/example.py).
 
 ## Todo
 
-- Chess library implementation in C
-- Database support (Sqlite implementation for local use)
+- Database support (Sqlite implementation for self-hosted usage)
 - Server API using [Starlette](https://github.com/encode/starlette) framework
-- Simple frontend for graphical use
+- Simple frontend for graphical usage
 
 ## Disclaimer
 
