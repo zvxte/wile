@@ -1,6 +1,6 @@
 from .game import Game
 from .player import Player
-from .move import Move
+from .move import Move, SanMove, UciMove
 from .analysis import Analysis
 from .puzzle import Puzzle
 from .color import Color

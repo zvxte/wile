@@ -1,26 +1,27 @@
 from .score import Score
+from .move import Move
 
 
 class Analysis:
     """
-    Represents engine analysis
+    Represents engine analysis line
 
     Raises:
-        AssertionError: If arguments with invalid types are provided.
-        ValueError: If argument values are falsy.
+        TypeError
+        ValueError
     """
 
-    def __init__(self, uci_move: str, multipv: int, score: Score):
-        assert isinstance(uci_move, str), ["Invalid uci_move type", uci_move]
-        assert isinstance(multipv, int), ["Invalid multipv type", multipv]
-        assert isinstance(score, Score), ["Invalid score type", score]
+    def __init__(self, move: Move, multipv: int, score: Score):
+        if (
+            not isinstance(move, Move)
+            or not isinstance(multipv, int)
+            or not isinstance(score, Score)
+        ):
+            raise TypeError("Invalid argument types")
 
-        if not uci_move:
-            raise ValueError("Invalid arguments")
-
-        self.uci_move = uci_move
+        self.move = move
         self.multipv = multipv
         self.score = score
 
     def __repr__(self) -> str:
-        return f"Analysis({self.uci_move}, {self.multipv}, {self.score})"
+        return f"Analysis({self.move}, {self.multipv}, {self.score})"

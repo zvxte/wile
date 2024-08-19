@@ -1,16 +1,17 @@
-from .player import Player
-from .move import Move
-from .color import Color
 from .platform import Platform
+from .player import Player
+from .color import Color
+from .move import Move
+from .analysis import Analysis
 
 
 class Game:
     """
     Represents chess game
-    
+
     Raises:
-        AssertionError: If arguments with invalid types are provided.
-        ValueError: If argument values are falsy.
+        TypeError
+        ValueError
     """
 
     def __init__(
@@ -22,19 +23,24 @@ class Game:
         black: Player,
         side: Color,
         initial_fen: str,
-        moves: list[Move]
+        moves: list[Move],
+        analyses: list[list[Analysis]] | None = None,
     ):
-        assert isinstance(game_id, str), ["Invalid game_id type", game_id]
-        assert isinstance(platform, Platform), ["Invalid platform type", platform]
-        assert isinstance(url, str), ["Invalid url type", url]
-        assert isinstance(white, Player), ["Invalid white type", white]
-        assert isinstance(black, Player), ["Invalid black type", black]
-        assert isinstance(side, Color), ["Invalid side type", side]
-        assert isinstance(initial_fen, str), ["Invalid initial_fen type", initial_fen]
-        assert isinstance(moves, list), ["Invalid moves type", moves]
+        if (
+            not isinstance(game_id, str)
+            or not isinstance(platform, Platform)
+            or not isinstance(url, str)
+            or not isinstance(white, Player)
+            or not isinstance(black, Player)
+            or not isinstance(side, Color)
+            or not isinstance(initial_fen, str)
+            or not isinstance(moves, list)
+            or not isinstance(analyses, list | None)
+        ):
+            raise TypeError("Invalid argument types")
 
         if not game_id or not url or not initial_fen or not moves:
-            raise ValueError("Invalid arguments")
+            raise ValueError("Invalid argument values")
 
         self.game_id = game_id
         self.platform = platform
@@ -44,6 +50,7 @@ class Game:
         self.side = side
         self.initial_fen = initial_fen
         self.moves = moves
+        self.analyses = analyses
 
     def __repr__(self) -> str:
-        return f"Game(\n{self.game_id}\n{self.platform}\n{self.url}\n{self.white}\n{self.black}\n{self.side}\n{self.initial_fen}\n{self.moves}\n)"
+        return f"Game(\n{self.game_id}\n{self.platform}\n{self.url}\n{self.white}\n{self.black}\n{self.side}\n{self.initial_fen}\n{self.moves}\n{self.analyses}\n)"
