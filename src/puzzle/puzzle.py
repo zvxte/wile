@@ -1,6 +1,7 @@
 from typing import Protocol, Iterable
 
 from src.chess.chess import ChessPy
+from src.chess.error import ChessError
 from src.models.score import ScoreName
 
 from ..models import Game, Puzzle, Color
@@ -34,45 +35,54 @@ class AnalysisBasedPuzzleCreator:
     """Creates chess puzzles based purely on engine's analysis"""
 
     def __init__(self):
-        self.chess = ChessPy()
+        self.chessboard = ChessPy()
 
     def create(self, game: Game) -> list[Puzzle]:
+        if game.analyses is None:
+            return []
+
         puzzles: list[Puzzle] = []
         start = 10 if game.side == Color.WHITE else 11
 
         for i in range(start, len(game.moves) - 1, 2):
             move = game.moves[i]
-            if move.score is None or move.analyses is None:
-                continue
-            best_line = move.analyses[0]
+            best_lines = game.analyses[i]
+            best_score = best_lines[0].score
+            next_best_score = game.analyses[i + 1][0].score
+
             if (
-                move.score.score_name == ScoreName.CP
-                and best_line.score.score_name == ScoreName.CP
-            ):
-                if (
-                    -400 < move.score.score_value < 400
-                    and abs(move.score.score_value) - abs(best_line.score.score_value)
+                next_best_score.score_name == ScoreName.CP
+                and best_score.score_name == ScoreName.CP
+                and (-400 < next_best_score.score_value < 400)
+                and (
+                    abs(next_best_score.score_value)
+                    - abs(best_score.score_value)
                     > 100
-                ):
-                    self.chess.from_fen(game.initial_fen)
-                    uci_moves = [move.uci_move for move in game.moves[:i]]
+                )
+            ):
+                uci_moves = [move.uci_move.value for move in game.moves[:i]]
+
+                try:
+                    self.chessboard.from_fen(game.initial_fen)
                     for uci_move in uci_moves:
-                        if uci_move is None:
-                            return puzzles
-                        self.chess.move(uci_move)
-                    fen = self.chess.to_fen()
-                    puzzles.append(
-                        Puzzle(
-                            fen=fen,
-                            move=move,
-                            game_id=game.game_id,
-                            platform=game.platform,
-                            url=game.url,
-                            white=game.white,
-                            black=game.black,
-                            side=game.side,
-                        )
+                        self.chessboard.move(uci_move)
+                    fen = self.chessboard.to_fen()
+                except (ChessError, TypeError) as e:
+                    return puzzles
+                puzzles.append(
+                    Puzzle(
+                        fen=fen,
+                        move=move,
+                        score=next_best_score,
+                        best_lines=best_lines,
+                        game_id=game.game_id,
+                        platform=game.platform,
+                        url=game.url,
+                        white=game.white,
+                        black=game.black,
+                        side=game.side,
                     )
+                )
         return puzzles
 
 
@@ -88,29 +98,20 @@ async def main():
     fetched_games = await fetcher.fetch("hikaru", 1720908000)
     games = [game_parser.parse(game, "hikaru") for game in fetched_games][:4]
 
-    chessboard = ChessPy()
-    for game in games:
-        chessboard.from_fen(game.initial_fen)
-        for move in game.moves:
-            uci_move = chessboard.san_to_uci(move.san_move)
-            move.uci_move = uci_move
-            chessboard.move(uci_move)
-
     engine = LocalStockfishEngine("stockfish", depth=18, multipv=1, max_workers=10)
     analysis_parser = StockfishAnalysisParser()
 
     for game in games:
-        uci_moves = [move.uci_move for move in game.moves]
+        uci_moves = [move.uci_move.value for move in game.moves]
         engine_result = await engine.analyze(game.initial_fen, uci_moves)
-        for i in range(len(game.moves)):
-            move = game.moves[i]
-            analyses = [
-                analysis_parser.parse(analysis, move.side)
-                for analysis in engine_result[i]
-            ]
-            move.analyses = [] + analyses
-            if i > 0:
-                game.moves[i - 1].score = analyses[0].score
+        analyses = []
+        for i, analysis in enumerate(engine_result):
+            best_lines = []
+            for line in analysis:
+                analysis = analysis_parser.parse(line, game.initial_fen, game.moves[:i])
+                best_lines.append(analysis)
+            analyses.append(best_lines)
+        game.analyses = analyses
 
     for game in games:
         print("GAME: ", game, "\n\n")

@@ -2,7 +2,8 @@ from typing import Protocol, Any
 
 from .error import ParserError
 from .utils import parse_pgn_moves
-from ..models import Game, Player, Move, Color, Platform
+from ..models import Game, Player, Move, SanMove, UciMove, Color, Platform
+from ..chess import ChessPy, ChessError
 
 
 class GameParser(Protocol):
@@ -14,35 +15,50 @@ class GameParser(Protocol):
 
         Args:
             game (Any)
-            username (str): Username to determine player's side.
+            username (str): Needed to determine player's side.
 
         Returns:
             Game
 
         Raises:
-            AssertionError: If arguments with invalid types are provided.
+            TypeError
             ParserError
         """
         raise NotImplementedError
 
 
 class ChessComGameParser:
-    def parse(self, game: dict[str, Any], username: str) -> Game:
-        assert isinstance(game, dict), ["Invalid game type", game]
-        assert isinstance(username, str), ["Invalid username type", username]
+    def __init__(self):
+        self.chessboard = ChessPy()
 
-        moves = [Move(san_move) for san_move in parse_pgn_moves(game["pgn"])]
-        for i, move in enumerate(moves):
-            move.side = Color.WHITE if i % 2 == 0 else Color.BLACK
+    def parse(self, game: dict[str, Any], username: str) -> Game:
+        if not isinstance(game, dict) or not isinstance(username, str):
+            raise TypeError("Invalid argument types")
 
         try:
+            game_id = game["uuid"]
+            initial_fen = game["initial_setup"]
+            url = game["url"]
             white = Player(
                 username=game["white"]["username"], rating=game["white"]["rating"]
             )
             black = Player(
                 username=game["black"]["username"], rating=game["black"]["rating"]
             )
+
         except KeyError as e:
+            raise ParserError(e)
+
+        san_moves = parse_pgn_moves(game["pgn"])
+        moves: list[Move] = []
+        try:
+            self.chessboard.from_fen(initial_fen)
+            for san_move in san_moves:
+                uci_move = self.chessboard.san_to_uci(san_move)
+                side = Color(self.chessboard.color())
+                moves.append(Move(SanMove(san_move), UciMove(uci_move), side))
+                self.chessboard.move(uci_move)
+        except (ChessError, TypeError, ValueError) as e:
             raise ParserError(e)
 
         if white.username.lower() == username.lower():
@@ -54,26 +70,31 @@ class ChessComGameParser:
 
         try:
             return Game(
-                game_id=game["uuid"],
+                game_id=game_id,
                 platform=Platform.CHESSCOM,
-                url=game["url"],
+                url=url,
                 white=white,
                 black=black,
                 side=side,
-                initial_fen=game["initial_setup"],
+                initial_fen=initial_fen,
                 moves=moves,
+                analyses=None,
             )
-        except (KeyError, ValueError) as e:
+        except (TypeError, ValueError) as e:
             raise ParserError(e)
 
 
 class LichessGameParser:
+    def __init__(self):
+        self.chessboard = ChessPy()
+
     def parse(self, game: Any, username: str) -> Game:
         assert isinstance(game, dict), ["Invalid game type", game]
         assert isinstance(username, str), ["Invalid username type", username]
 
         try:
-            moves = [Move(san_move) for san_move in game["moves"].split(" ")]
+            game_id = game["id"]
+            url = f"https://lichess.org/{game["id"]}"
             white = Player(
                 game["players"]["white"]["user"]["name"],
                 game["players"]["white"]["rating"],
@@ -85,8 +106,21 @@ class LichessGameParser:
         except KeyError as e:
             raise ParserError(e)
 
-        for i, move in enumerate(moves):
-            move.side = Color.WHITE if i % 2 == 0 else Color.BLACK
+        initial_fen = game.get("initialFen")
+        if initial_fen is None:
+            initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+        san_moves = game["moves"].split(" ")
+        moves: list[Move] = []
+        try:
+            self.chessboard.from_fen(initial_fen)
+            for san_move in san_moves:
+                uci_move = self.chessboard.san_to_uci(san_move)
+                side = Color(self.chessboard.color())
+                moves.append(Move(SanMove(san_move), UciMove(uci_move), side))
+                self.chessboard.move(uci_move)
+        except (ChessError, TypeError, ValueError) as e:
+            raise ParserError(e)
 
         if white.username.lower() == username.lower():
             side = Color.WHITE
@@ -95,26 +129,28 @@ class LichessGameParser:
         else:
             raise ParserError("Invalid username")
 
-        initial_fen = game.get("initialFen")
-        if initial_fen is None:
-            initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-
-        return Game(
-            game_id=game["id"],
-            platform=Platform.LICHESS,
-            url=f"https://lichess.org/{game["id"]}",
-            white=white,
-            black=black,
-            side=side,
-            initial_fen=initial_fen,
-            moves=moves,
-        )
+        try:
+            return Game(
+                game_id=game_id,
+                platform=Platform.LICHESS,
+                url=url,
+                white=white,
+                black=black,
+                side=side,
+                initial_fen=initial_fen,
+                moves=moves,
+                analyses=None,
+            )
+        except (TypeError, ValueError) as e:
+            raise ParserError(e)
 
 
 async def main():
     # testing
     # chesscom_fetcher = ChessComFetcher()
-    # chesscom_games = await chesscom_fetcher.fetch("hikaru", 1721088000)  # since July 16, 2024
+    # chesscom_games = await chesscom_fetcher.fetch(
+    #     "hikaru", 1721088000
+    # )  # since July 16, 2024
 
     # chesscom_parser = ChessComGameParser()
     # for game in chesscom_games[:5]:
