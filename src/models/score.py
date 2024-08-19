@@ -11,11 +11,11 @@ class Score:
     Represents analysis score
     
     Raises:
-        AssertionError: If arguments with invalid types are provided.
+        TypeError
     """
     def __init__(self, score_name: ScoreName, score_value: int):
-        assert isinstance(score_name, ScoreName), ["Invalid score_name type", score_name]
-        assert isinstance(score_value, int), ["Invalid score_value type", score_value]
+        if not isinstance(score_name, ScoreName) or not isinstance(score_value, int):
+            raise TypeError("Invalid argument types")
         
         self.score_name = score_name
         self.score_value = score_value
