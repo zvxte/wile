@@ -19,7 +19,7 @@ class LocalStockfishEngine:
         max_workers (int): Number of Stockfish processes running at the same time
 
     Raises:
-        AssertionError: If arguments with invalid types are provided.
+        TypeError
     """
 
     def __init__(
@@ -29,13 +29,13 @@ class LocalStockfishEngine:
         multipv: int | None = None,
         max_workers: int | None = None,
     ):
-        assert isinstance(path, str), ["Invalid path type", path]
-        assert isinstance(depth, int | None), ["Invalid depth type", depth]
-        assert isinstance(multipv, int | None), ["Invalid multipv type", multipv]
-        assert isinstance(max_workers, int | None), [
-            "Invalid max_workers type",
-            max_workers,
-        ]
+        if (
+            not isinstance(path, str)
+            or not isinstance(depth, int | None)
+            or not isinstance(multipv, int | None)
+            or not isinstance(max_workers, int | None)
+        ):
+            raise TypeError("Invalid argument types")
 
         if depth is None:
             depth = 18
@@ -51,15 +51,15 @@ class LocalStockfishEngine:
         self.max_workers = max_workers
 
     async def analyze(self, initial_fen: str, uci_moves: list[str]) -> list[list[str]]:
-        assert isinstance(initial_fen, str), ["Invalid initial_fen type", initial_fen]
-        assert isinstance(uci_moves, list), ["Invalid uci_moves type", uci_moves]
+        if not isinstance(initial_fen, str) or not isinstance(uci_moves, list):
+            raise TypeError("Invalid argument types")
 
         input_queue = SimpleQueue()
         analyses: list[Any] = [None] * (len(uci_moves) + 1)
 
         input_queue.put((0, [""]))
         for index in range(1, len(uci_moves) + 1):
-            input_queue.put((index, uci_moves[: index]))
+            input_queue.put((index, uci_moves[:index]))
 
         async def run_worker() -> None:
             worker = StockfishEngineWorker(self.path, self.depth, self.multipv)

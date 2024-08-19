@@ -35,7 +35,8 @@ class Fetcher(Protocol):
             Iterable[Any]: All found games. Iterable could be empty if no game was found.
 
         Raises:
-            AssertionError: If arguments with invalid types are provided.
+            TypeError
+            ValueError
             FetcherError: If arguments are logically invalid. If failed to fetch games.
         """
         raise NotImplementedError
@@ -52,16 +53,19 @@ class ChessComFetcher:
         # https://www.chess.com/news/view/published-data-api
         # Endpoint:
         # https://api.chess.com/pub/player/{username}/games/{YYYY}/{MM}
-        
+
         current_timestamp = int(time())
         if until is None:
             until = current_timestamp
         elif until > current_timestamp:
             until = current_timestamp
 
-        assert isinstance(username, str), ["Invalid username type", username]
-        assert isinstance(since, int), ["Invalid since type", since]
-        assert isinstance(until, int), ["Invalid until type", until]
+        if (
+            not isinstance(username, str)
+            or not isinstance(since, int)
+            or not isinstance(until, int)
+        ):
+            raise TypeError("Invalid argument types")
 
         if (
             len(username) < 3
@@ -70,7 +74,7 @@ class ChessComFetcher:
             or until < 1177977600
             or since > until
         ):
-            raise FetcherError("Invalid arguments")
+            raise ValueError("Invalid argument values")
 
         since_date = date.fromtimestamp(since)
         until_date = date.fromtimestamp(until)
@@ -116,17 +120,20 @@ class LichessFetcher:
         # https://lichess.org/api#tag/Games/operation/apiGamesUser
         # Endpoint:
         # https://lichess.org/api/games/user/{username} + query parameters
-        
+
         current_timestamp = int(time())
         if until is None:
             until = current_timestamp
         elif until > current_timestamp:
             until = current_timestamp
-        
-        assert isinstance(username, str), ["Invalid username type", username]
-        assert isinstance(since, int), ["Invalid since type", since]
-        assert isinstance(until, int), ["Invalid until type", until]
-        
+
+        if (
+            not isinstance(username, str)
+            or not isinstance(since, int)
+            or not isinstance(until, int)
+        ):
+            raise TypeError("Invalid argument types")
+
         if (
             len(username) < 2
             or since > current_timestamp
@@ -134,7 +141,7 @@ class LichessFetcher:
             or until < 1356998400
             or since > until
         ):
-            raise FetcherError("Invalid arguments")
+            raise ValueError("Invalid argument values")
 
         url = f"https://lichess.org/api/games/user/{username}"
         headers = {

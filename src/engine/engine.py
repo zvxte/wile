@@ -25,7 +25,7 @@ class Engine(Protocol):
             Iterable[Any]: Result of analyzed positions.
 
         Raises:
-            AssertionError: If arguments with invalid types are provided.
+            TypeError
             EngineError: If failed to run engine process; If failed to communicate with the engine process.
         """
         raise NotImplementedError

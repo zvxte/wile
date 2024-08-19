@@ -7,9 +7,12 @@ class StockfishEngineWorker:
     """Stockfish Engine Worker"""
 
     def __init__(self, path: str, depth: int, multipv: int):
-        assert isinstance(path, str), ["Invalid path type", path]
-        assert isinstance(depth, int), ["Invalid depth type", depth]
-        assert isinstance(multipv, int), ["Invalid multipv type", multipv]
+        if (
+            not isinstance(path, str)
+            or not isinstance(depth, int)
+            or not isinstance(multipv, int)
+        ):
+            raise TypeError("Invalid argument types")
 
         self.path = path
         self.depth = depth
@@ -48,8 +51,9 @@ class StockfishEngineWorker:
 
     async def position(self, initial_fen: str, uci_moves: list[str]) -> None:
         """Sets board position"""
-        assert isinstance(initial_fen, str), ["Invalid initial_fen type", initial_fen]
-        assert isinstance(uci_moves, list), ["Invalid uci_moves type", uci_moves]
+        if not isinstance(initial_fen, str) or not isinstance(uci_moves, list):
+            raise TypeError("Invalid argument types")
+
         await self._clear_stdout_stream()
         await self._write("isready\n")
         status = await self._read_line()
