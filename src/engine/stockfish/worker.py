@@ -1,5 +1,4 @@
 from subprocess import SubprocessError
-from typing import Optional
 from asyncio import create_subprocess_exec, wait_for
 from asyncio.subprocess import PIPE, Process
 
@@ -15,7 +14,7 @@ class StockfishEngineWorker:
         self.path = path
         self.depth = depth
         self.multipv = multipv
-        self._process: Optional[Process] = None
+        self._process: Process | None = None
 
     async def open(self) -> None:
         """Opens Stockfish subprocess"""
@@ -78,7 +77,7 @@ class StockfishEngineWorker:
                 break
         return best_lines
 
-    async def _read_line(self) -> Optional[str]:
+    async def _read_line(self) -> str | None:
         if self._process and self._process.stdout:
             try:
                 line = await wait_for(self._process.stdout.readline(), 1)

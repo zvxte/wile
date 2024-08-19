@@ -1,5 +1,5 @@
 from subprocess import SubprocessError
-from typing import Optional, Union, Any
+from typing import Any
 from os import cpu_count
 from queue import SimpleQueue
 from asyncio import TaskGroup
@@ -25,14 +25,14 @@ class LocalStockfishEngine:
     def __init__(
         self,
         path: str,
-        depth: Optional[int] = None,
-        multipv: Optional[int] = None,
-        max_workers: Optional[int] = None,
+        depth: int | None = None,
+        multipv: int | None = None,
+        max_workers: int | None = None,
     ):
         assert isinstance(path, str), ["Invalid path type", path]
-        assert isinstance(depth, Union[int, None]), ["Invalid depth type", depth]
-        assert isinstance(multipv, Union[int, None]), ["Invalid multipv type", multipv]
-        assert isinstance(max_workers, Union[int, None]), [
+        assert isinstance(depth, int | None), ["Invalid depth type", depth]
+        assert isinstance(multipv, int | None), ["Invalid multipv type", multipv]
+        assert isinstance(max_workers, int | None), [
             "Invalid max_workers type",
             max_workers,
         ]

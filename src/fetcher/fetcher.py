@@ -1,6 +1,6 @@
 from datetime import date
 from time import time
-from typing import Any, Iterable, Optional, Protocol
+from typing import Any, Iterable, Protocol
 from json import loads
 
 from httpx import AsyncClient, HTTPError
@@ -21,7 +21,7 @@ class Fetcher(Protocol):
         self,
         username: str,
         since: int,
-        until: Optional[int] = None,
+        until: int | None = None,
     ) -> Iterable[Any]:
         """
         Fetches chess games
@@ -29,7 +29,7 @@ class Fetcher(Protocol):
         Args:
             username (str)
             since (int): Since when to fetch the games as unix timestamp.
-            until (Optional[int]): Until when to fetch the games as unix timestamp. Defaults to now.
+            until (int | None): Until when to fetch the games as unix timestamp. Defaults to now.
 
         Returns:
             Iterable[Any]: All found games. Iterable could be empty if no game was found.
@@ -46,7 +46,7 @@ class ChessComFetcher:
         self,
         username: str,
         since: int,
-        until: Optional[int] = None,
+        until: int | None = None,
     ) -> list[dict[str, Any]]:
         # Fetching from Chess.com public API
         # https://www.chess.com/news/view/published-data-api
@@ -110,7 +110,7 @@ class LichessFetcher:
         self,
         username: str,
         since: int,
-        until: Optional[int] = None,
+        until: int | None = None,
     ) -> list[dict[str, Any]]:
         # Fetching from Lichess.org public API
         # https://lichess.org/api#tag/Games/operation/apiGamesUser
