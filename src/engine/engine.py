@@ -6,9 +6,8 @@ class Engine(Protocol):
     Engine Interface
 
     Engine implementations are responsible for communicating with chess engines
-    to analyze chess positions. Analyzed positions can then be parsed by
-    appropriate analysis parser, appended to it's move object and searched
-    through by a puzzle creator to create puzzles.
+    to analyze chess positions. Analyzed positions should be later on parsed by
+    appropriate analysis parser.
     """
 
     async def analyze(

@@ -12,10 +12,9 @@ class PuzzleCreator(Protocol):
     Puzzle Creator Interface
 
     Puzzle creator implementations are responsible for creating
-    chess puzzles based on some rules. Moves of a given game
-    should be already analyzed before invoking any methods or
-    creator will always return empty iterable, but single
-    not analyzed moves will mostly not interrupt.
+    chess puzzles based on some rules. Given game should be
+    already analyzed before invoking any methods or
+    creator will always return empty iterable.
     """
 
     def create(self, game: Game) -> Iterable[Puzzle]:
