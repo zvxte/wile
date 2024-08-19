@@ -1,4 +1,4 @@
-from typing import Optional, Protocol
+from typing import Protocol
 
 from chess import (
     STARTING_FEN,
@@ -6,6 +6,8 @@ from chess import (
     InvalidMoveError,
     IllegalMoveError,
     AmbiguousMoveError,
+    WHITE,
+    BLACK,
 )
 
 from .error import ChessError
@@ -22,23 +24,20 @@ class Chess(Protocol):
 
     def move(self, uci_move: str) -> None:
         """
-        Makes a move
+        Makes a move.
 
         Args:
             uci_move (str)
 
-        Returns:
-            None
-
         Raises:
-            AssertionError: If arguments with invalid types are provided.
+            TypeError
             ChessError: If move is illegal or invalid.
         """
         raise NotImplementedError
 
     def san_to_uci(self, san_move: str) -> str:
         """
-        Converts from SAN to UCI notation
+        Converts from SAN to UCI notation.
 
         Args:
             san_move (str)
@@ -47,36 +46,56 @@ class Chess(Protocol):
             str: Move in UCI notation.
 
         Raises:
-            AssertionError: If arguments with invalid types are provided.
+            TypeError
             ChessError: If move is invalid.
         """
         raise NotImplementedError
 
+    def uci_to_san(self, uci_move: str) -> str:
+        """
+        Converts from UCI notation to SAN.
+
+        Args:
+            uci_move (str)
+
+        Returns:
+            str: Move in SAN.
+
+        Raises:
+            TypeError
+            ChessError: If move is invalid.
+        """
+
+        raise NotImplementedError
+
     def from_fen(self, fen: str) -> None:
         """
-        Sets up current position from given FEN
+        Sets up current position from given FEN.
 
         Args:
             fen (str)
 
-        Returns:
-            None
-
         Raises:
-            AssertionError: If arguments with invalid types are provided.
+            TypeError
             ChessError: If FEN is invalid.
         """
         raise NotImplementedError
 
     def to_fen(self) -> str:
         """
-        Returns FEN of current position
-
-        Args:
-            None
+        Returns FEN of current position.
 
         Returns:
             str: Position in FEN.
+        """
+        raise NotImplementedError
+
+    def color(self) -> int:
+        """
+        Returns current side.
+
+        Returns:
+            int: 0 for white, 1 for black.
         """
         raise NotImplementedError
 
@@ -86,7 +105,8 @@ class ChessPy:
         self.chessboard = Board()
 
     def move(self, uci_move: str) -> None:
-        assert isinstance(uci_move, str), ["Invalid uci_move type", uci_move]
+        if not isinstance(uci_move, str):
+            raise TypeError("Invalid argument types", type(uci_move))
 
         try:
             self.chessboard.push_uci(uci_move)
@@ -94,7 +114,8 @@ class ChessPy:
             raise ChessError(e)
 
     def san_to_uci(self, san_move: str) -> str:
-        assert isinstance(san_move, str), ["Invalid san_move type", san_move]
+        if not isinstance(san_move, str):
+            raise TypeError("Invalid argument types", type(san_move))
 
         try:
             uci_move = self.chessboard.parse_san(san_move).uci()
@@ -109,8 +130,24 @@ class ChessPy:
         ) as e:
             raise ChessError(e)
 
+    def uci_to_san(self, uci_move: str) -> str:
+        if not isinstance(uci_move, str):
+            raise TypeError("Invalid argument types", type(uci_move))
+
+        try:
+            move = self.chessboard.parse_uci(uci_move)
+            return self.chessboard.san(move)
+
+        except (
+            ValueError,
+            InvalidMoveError,
+            IllegalMoveError,
+        ) as e:
+            raise ChessError(e)
+
     def from_fen(self, fen: str) -> None:
-        assert isinstance(fen, str), ["Invalid fen type", fen]
+        if not isinstance(fen, str):
+            raise TypeError("Invalid argument types", type(fen))
 
         try:
             self.chessboard.set_fen(fen)
@@ -119,6 +156,9 @@ class ChessPy:
 
     def to_fen(self) -> str:
         return self.chessboard.fen()
+
+    def color(self) -> int:
+        return 0 if self.chessboard.turn == WHITE else 1
 
     def __repr__(self) -> str:
         return self.chessboard.__str__()
