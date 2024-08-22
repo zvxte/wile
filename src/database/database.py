@@ -9,8 +9,8 @@ class Database(Protocol):
     async def connect(self) -> None:
         raise NotImplementedError
 
-    async def create_tables(self) -> None:
+    async def disconnect(self) -> None:
         raise NotImplementedError
 
-    async def disconnect(self) -> None:
+    async def create_tables(self) -> None:
         raise NotImplementedError
