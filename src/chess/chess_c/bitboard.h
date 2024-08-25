@@ -1,3 +1,7 @@
 #pragma once
 
-typedef unsigned long long Bitboard_t;
+#include "types.h"
+
+typedef struct Bitboard {
+    u64 value;
+} Bitboard_t;
