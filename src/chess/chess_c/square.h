@@ -1,6 +1,9 @@
 #pragma once
 
-typedef enum Square {
+#include "file.h"
+#include "rank.h"
+
+typedef enum Square { // clang-format off
     SQUARE_A1, SQUARE_B1, SQUARE_C1, SQUARE_D1, SQUARE_E1, SQUARE_F1, SQUARE_G1, SQUARE_H1,
     SQUARE_A2, SQUARE_B2, SQUARE_C2, SQUARE_D2, SQUARE_E2, SQUARE_F2, SQUARE_G2, SQUARE_H2,
     SQUARE_A3, SQUARE_B3, SQUARE_C3, SQUARE_D3, SQUARE_E3, SQUARE_F3, SQUARE_G3, SQUARE_H3,
@@ -10,4 +13,6 @@ typedef enum Square {
     SQUARE_A7, SQUARE_B7, SQUARE_C7, SQUARE_D7, SQUARE_E7, SQUARE_F7, SQUARE_G7, SQUARE_H7,
     SQUARE_A8, SQUARE_B8, SQUARE_C8, SQUARE_D8, SQUARE_E8, SQUARE_F8, SQUARE_G8, SQUARE_H8,
     SQUARE_NONE,
-} Square_t;
+} Square_t; // clang-format on
+
+Square_t square_init_from_file_and_rank(File_t file, Rank_t rank);
