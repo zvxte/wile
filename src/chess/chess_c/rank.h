@@ -1,6 +1,8 @@
 #pragma once
 
-typedef enum Rank {
+#include "types.h"
+
+typedef enum Rank : i8 {
     RANK_1,
     RANK_2,
     RANK_3,
@@ -10,3 +12,5 @@ typedef enum Rank {
     RANK_7,
     RANK_8,
 } Rank_t;
+
+Rank_t rank_init_from_char(char character);
