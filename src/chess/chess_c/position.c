@@ -61,6 +61,8 @@ Position_t position_init_empty() {
 }
 
 Status_t position_init_from_fen(char *fen, Position_t *position) {
+    // Example: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+    
     if (!fen || !position) {
         return STATUS_ERROR;
     }
