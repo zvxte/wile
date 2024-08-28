@@ -35,3 +35,4 @@ typedef struct Position {
 Position_t position_init();
 Position_t position_init_empty();
 Status_t position_init_from_fen(char *fen, Position_t *position);
+Status_t position_move(Position_t *position, Move_t *move);
