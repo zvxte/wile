@@ -8,6 +8,3 @@ __pycache__
 
 # Outputs
 *.o
-
-# Config
-.zed
