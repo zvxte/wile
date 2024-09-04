@@ -1,0 +1,3 @@
+Chess library implementation in C
+
+In progress...
