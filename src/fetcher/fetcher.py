@@ -150,6 +150,7 @@ class LichessFetcher:
         params = {
             "since": since * 1000,
             "until": until * 1000,
+            "perfType": "ultraBullet,bullet,blitz,rapid,classical,correspondence,chess960",
         }
 
         games = []
