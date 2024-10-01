@@ -14,12 +14,6 @@ pip install -r requirements.txt
 ```
 See [example](./src/example.py).
 
-## Todo
-
-- Database support (Sqlite implementation for self-hosted usage)
-- Server API using [Starlette](https://github.com/encode/starlette) framework
-- Simple frontend for graphical usage
-
 ## Disclaimer
 
 This is a personal project created for learning purposes and is **not suitable** for real-world usage.
