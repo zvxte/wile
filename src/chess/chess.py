@@ -164,10 +164,6 @@ class ChessPy:
         return self.chessboard.__str__()
 
 
-# class ChessC:
-#     pass  # TODO
-
-
 if __name__ == "__main__":
     chess = ChessPy()
     fen = chess.to_fen()
